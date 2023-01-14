@@ -6,8 +6,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
+
+import java.util.Map;
+
 
 @SpringBootApplication
 public class SampleTwitter4jApplication {
@@ -18,21 +19,20 @@ public class SampleTwitter4jApplication {
 
     @Bean
     ApplicationRunner runner(Twitter twitter) {
-        return args -> twitter.timelines()
-                .getHomeTimeline()
-                .forEach(System.out::println);
+        return args -> twitter.v1().timelines().getHomeTimeline().forEach(System.out::println);
     }
 
     @Bean
-    Twitter twitter(//
-                    @Value("${twitter.consumerKey}") String twitterConsumerKey,
-                    @Value("${twitter.consumerSecret}") String twitterConsumerSecret,
-                    @Value("${twitter.oauthTokenKey}") String twitterOauthTokenKey,
-                    @Value("${twitter.oauthTokenSecret}") String twitterOauthTokenSecret) {
-        var twitter = TwitterFactory.getSingleton();
-        twitter.setOAuthConsumer(twitterConsumerKey, twitterConsumerSecret);
-        twitter.setOAuthAccessToken(new AccessToken(twitterOauthTokenKey, twitterOauthTokenSecret));
-        return twitter;
+    Twitter twitter(
+            @Value("${TWITTER_CONSUMERKEY}") String twitterConsumerKey,
+            @Value("${TWITTER_CONSUMERSECRET}") String twitterConsumerSecret,
+            @Value("${TWITTER_OAUTHTOKENKEY}") String tokenKey,
+            @Value("${TWITTER_OAUTHTOKENSECRET}") String tokenKeySecret) {
+        return Twitter
+                .newBuilder()//
+                .oAuthConsumer(twitterConsumerKey, twitterConsumerSecret)//
+                .oAuthAccessToken(tokenKey, tokenKeySecret)
+                .build();
     }
 
 }
